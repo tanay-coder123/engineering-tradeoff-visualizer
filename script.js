@@ -24,13 +24,27 @@ function updateValues() {
 }
 
 function getWeights() {
-    const total =
-        Number(speedP.value) +
-        Number(torqueP.value) +
-        Number(costP.value);
+    const s = Number(speedP.value);
+    const t = Number(torqueP.value);
+    const c = Number(costP.value);
+
+    // Individual bounds check
+    if (s < 0 || t < 0 || c < 0) {
+        statusOut.textContent = "Priorities cannot be negative";
+        statusOut.style.color = "red";
+        return null;
+    }
+
+    if (s > 100 || t > 100 || c > 100) {
+        statusOut.textContent = "Each priority must be ≤ 100";
+        statusOut.style.color = "red";
+        return null;
+    }
+
+    const total = s + t + c;
 
     if (total !== 100) {
-        statusOut.textContent = `Total priority must equal 100 (Current: ${total})`;
+        statusOut.textContent = `Priority total must equal 100 (Current: ${total})`;
         statusOut.style.color = "red";
         return null;
     }
@@ -39,11 +53,12 @@ function getWeights() {
     statusOut.style.color = "green";
 
     return {
-        speed: speedP.value / 100,
-        torque: torqueP.value / 100,
-        cost: costP.value / 100
+        speed: s / 100,
+        torque: t / 100,
+        cost: c / 100
     };
 }
+
 
 function calculate() {
     const weights = getWeights();
