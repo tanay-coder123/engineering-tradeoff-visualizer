@@ -9,7 +9,7 @@
 
 <nav>
     <h1>Engineering Trade-Off Visualizer</h1>
-    <p>Interactive design comparison tool</p>
+    <p>Interactive design trade-off analysis</p>
 </nav>
 
 <main>
@@ -32,7 +32,7 @@
 </section>
 
 <section class="card">
-    <h2>Design Priorities (Allocate 100)</h2>
+    <h2>Design Priorities (Must Total 100)</h2>
 
     <div class="priority-grid">
         <div>
@@ -54,19 +54,16 @@
 
 <section class="card">
     <h2>Visualization</h2>
-
-    <div class="chart-container">
-        <canvas id="designChart" width="600" height="300"></canvas>
-        <canvas id="priorityChart" width="600" height="200"></canvas>
-    </div>
+    <canvas id="designChart" width="600" height="300"></canvas>
+    <canvas id="priorityChart" width="600" height="200"></canvas>
 </section>
 
 <section class="card">
-    <h2>Live Evaluation</h2>
+    <h2>Evaluation</h2>
 
-    <p><strong>Score:</strong> <span id="score">0.00</span></p>
-    <p><strong>Evaluation:</strong> <span id="evaluation"></span></p>
-    <p><strong>Design Focus:</strong> <span id="focus"></span></p>
+    <p><strong>Score:</strong> <span id="score">—</span></p>
+    <p><strong>Evaluation:</strong> <span id="evaluation">Waiting for valid inputs</span></p>
+    <p><strong>Design Focus:</strong> <span id="focus">—</span></p>
 
     <button id="saveBtn">Save Design</button>
 </section>
@@ -81,3 +78,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
