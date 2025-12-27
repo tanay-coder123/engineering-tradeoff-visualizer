@@ -2,85 +2,130 @@ const speed = document.getElementById("speed");
 const torque = document.getElementById("torque");
 const cost = document.getElementById("cost");
 
-const wSpeed = document.getElementById("wSpeed");
-const wTorque = document.getElementById("wTorque");
-const wCost = document.getElementById("wCost");
+const speedP = document.getElementById("speedPriority");
+const torqueP = document.getElementById("torquePriority");
+const costP = document.getElementById("costPriority");
 
-const speedVal = document.getElementById("speedVal");
-const torqueVal = document.getElementById("torqueVal");
-const costVal = document.getElementById("costVal");
+const scoreOut = document.getElementById("score");
+const evalOut = document.getElementById("evaluation");
+const focusOut = document.getElementById("focus");
+const statusOut = document.getElementById("priorityStatus");
 
-const scoreEl = document.getElementById("score");
-const evalEl = document.getElementById("evaluation");
-const focusEl = document.getElementById("focus");
-const weightDisplay = document.getElementById("weightDisplay");
+const designCanvas = document.getElementById("designChart");
+const priorityCanvas = document.getElementById("priorityChart");
+const dCtx = designCanvas.getContext("2d");
+const pCtx = priorityCanvas.getContext("2d");
 
-const canvas = document.getElementById("chart");
-const ctx = canvas.getContext("2d");
+const designList = document.getElementById("designList");
+let savedDesigns = [];
 
-const savedList = document.getElementById("saved");
-let saved = [];
-
-document.querySelectorAll("input").forEach(i =>
-    i.addEventListener("input", update)
-);
-
-function normalize(a, b, c) {
-    const sum = a + b + c || 1;
-    return [a / sum, b / sum, c / sum];
+function updateSliderLabels() {
+    document.getElementById("speedVal").textContent = speed.value;
+    document.getElementById("torqueVal").textContent = torque.value;
+    document.getElementById("costVal").textContent = cost.value;
 }
 
-function update() {
-    speedVal.textContent = speed.value;
-    torqueVal.textContent = torque.value;
-    costVal.textContent = cost.value;
+function getWeights() {
+    const s = Number(speedP.value);
+    const t = Number(torqueP.value);
+    const c = Number(costP.value);
 
-    const [ws, wt, wc] = normalize(
-        +wSpeed.value,
-        +wTorque.value,
-        +wCost.value
-    );
+    if (s < 0 || t < 0 || c < 0) {
+        statusOut.textContent = "Priorities cannot be negative";
+        statusOut.style.color = "red";
+        return null;
+    }
 
-    weightDisplay.textContent =
-        `Weights → Speed ${(ws*100).toFixed(0)}%, Torque ${(wt*100).toFixed(0)}%, Cost ${(wc*100).toFixed(0)}%`;
+    const total = s + t + c;
+    if (total !== 100) {
+        statusOut.textContent = `Total priority must equal 100 (Current: ${total})`;
+        statusOut.style.color = "red";
+        return null;
+    }
 
-    const score =
-        speed.value * ws +
-        torque.value * wt -
-        cost.value * wc;
+    statusOut.textContent = "Priority distribution valid";
+    statusOut.style.color = "green";
 
-    scoreEl.textContent = score.toFixed(2);
-
-    if (torque.value < 3) evalEl.textContent = "Fails minimum torque constraint";
-    else if (score >= 6) evalEl.textContent = "Well-balanced design";
-    else if (score >= 4) evalEl.textContent = "Acceptable trade-off";
-    else evalEl.textContent = "Suboptimal design";
-
-    if (ws > wt && ws > wc) focusEl.textContent = "Performance-focused";
-    else if (wt > ws && wt > wc) focusEl.textContent = "Power-focused";
-    else if (wc > ws && wc > wt) focusEl.textContent = "Cost-driven";
-    else focusEl.textContent = "Balanced";
-
-    drawChart();
+    return { speed: s / 100, torque: t / 100, cost: c / 100 };
 }
 
-function drawChart() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function calculate() {
+    const w = getWeights();
+    if (!w) return;
+
+    let score =
+        speed.value * w.speed +
+        torque.value * w.torque -
+        cost.value * w.cost;
+
+    if (torque.value < 5) score -= 1;
+
+    scoreOut.textContent = score.toFixed(2);
+
+    if (torque.value < 5) evalOut.textContent = "Fails minimum torque constraint";
+    else if (score >= 6) evalOut.textContent = "Well-balanced trade-off";
+    else if (score >= 4) evalOut.textContent = "Acceptable trade-off";
+    else evalOut.textContent = "Not optimal";
+
+    focusOut.textContent =
+        w.speed > w.torque && w.speed > w.cost ? "Speed-prioritized" :
+        w.torque > w.speed && w.torque > w.cost ? "Torque-prioritized" :
+        w.cost > w.speed && w.cost > w.torque ? "Cost-prioritized" :
+        "Balanced";
+
+    drawDesignChart();
+    drawPriorityChart();
+}
+
+function drawDesignChart() {
+    dCtx.clearRect(0, 0, 600, 300);
     const vals = [speed.value, torque.value, cost.value];
     const labels = ["Speed", "Torque", "Cost"];
-    const colors = ["#0077b6", "#00b4d8", "#adb5bd"];
 
     vals.forEach((v, i) => {
-        ctx.fillStyle = colors[i];
-        ctx.fillRect(100 + i*140, 260 - v*20, 80, v*20);
-        ctx.fillStyle = "#000";
-        ctx.fillText(labels[i], 110 + i*140, 280);
+        dCtx.fillStyle = "#415a77";
+        dCtx.fillRect(150 + i * 120, 260 - v * 20, 60, v * 20);
+        dCtx.fillStyle = "#000";
+        dCtx.fillText(labels[i], 155 + i * 120, 280);
     });
 }
 
-function saveDesign() {
-    saved.push(`Design ${saved.length + 1}: Score ${scoreEl.textContent}`);
-    savedList.innerHTML = saved.map(d => `<li>${d}</li>`).join("");
+function drawPriorityChart() {
+    pCtx.clearRect(0, 0, 600, 200);
+    const vals = [speedP.value, torqueP.value, costP.value];
+    const colors = ["#778da9", "#415a77", "#1b263b"];
+
+    let x = 50;
+    vals.forEach((v, i) => {
+        pCtx.fillStyle = colors[i];
+        pCtx.fillRect(x, 100 - v, 100, v);
+        x += 150;
+    });
 }
 
-update();
+document.getElementById("saveBtn").addEventListener("click", () => {
+    const name = document.getElementById("designName").value || "Unnamed Design";
+    savedDesigns.push({ name, score: Number(scoreOut.textContent) });
+    savedDesigns.sort((a, b) => b.score - a.score);
+    renderSaved();
+});
+
+function renderSaved() {
+    designList.innerHTML = "";
+    savedDesigns.forEach((d, i) => {
+        const div = document.createElement("div");
+        div.className = "design-card";
+        div.innerHTML = `<strong>${i + 1}. ${d.name}</strong><br>Score: ${d.score}`;
+        designList.appendChild(div);
+    });
+}
+
+[speed, torque, cost, speedP, torqueP, costP].forEach(el =>
+    el.addEventListener("input", () => {
+        updateSliderLabels();
+        calculate();
+    })
+);
+
+updateSliderLabels();
+calculate();
