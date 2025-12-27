@@ -1,0 +1,93 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef1f4;
+    color: #222;
+}
+
+nav {
+    background: #1b263b;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    max-width: 900px;
+    margin: auto;
+    padding: 25px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+input[type="text"] {
+    width: 280px;
+    padding: 8px;
+    margin-bottom: 20px;
+}
+
+.slider-group input {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.priority-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.priority-grid input {
+    width: 80px;
+    padding: 6px;
+    text-align: center;
+}
+
+#priorityStatus {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+canvas {
+    margin: 15px 0;
+    background: #fafafa;
+    border: 1px solid #ddd;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #003566;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #001d3d;
+}
+
+.design-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
