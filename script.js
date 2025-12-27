@@ -11,21 +11,19 @@ const evalOut = document.getElementById("evaluation");
 const focusOut = document.getElementById("focus");
 const statusOut = document.getElementById("priorityStatus");
 
-const designCanvas = document.getElementById("designChart");
-const priorityCanvas = document.getElementById("priorityChart");
-const dCtx = designCanvas.getContext("2d");
-const pCtx = priorityCanvas.getContext("2d");
+const dCtx = document.getElementById("designChart").getContext("2d");
+const pCtx = document.getElementById("priorityChart").getContext("2d");
 
 const designList = document.getElementById("designList");
 let savedDesigns = [];
 
-function updateSliderLabels() {
+function updateLabels() {
     document.getElementById("speedVal").textContent = speed.value;
     document.getElementById("torqueVal").textContent = torque.value;
     document.getElementById("costVal").textContent = cost.value;
 }
 
-function getWeights() {
+function validateWeights() {
     const s = Number(speedP.value);
     const t = Number(torqueP.value);
     const c = Number(costP.value);
@@ -50,31 +48,45 @@ function getWeights() {
 }
 
 function calculate() {
-    const w = getWeights();
-    if (!w) return;
+    updateLabels();
+    const weights = validateWeights();
+
+    drawDesignChart();
+    drawPriorityChart();
+
+    if (!weights) {
+        scoreOut.textContent = "—";
+        evalOut.textContent = "Waiting for valid priorities";
+        focusOut.textContent = "—";
+        return;
+    }
 
     let score =
-        speed.value * w.speed +
-        torque.value * w.torque -
-        cost.value * w.cost;
+        speed.value * weights.speed +
+        torque.value * weights.torque -
+        cost.value * weights.cost;
 
     if (torque.value < 5) score -= 1;
 
     scoreOut.textContent = score.toFixed(2);
 
-    if (torque.value < 5) evalOut.textContent = "Fails minimum torque constraint";
-    else if (score >= 6) evalOut.textContent = "Well-balanced trade-off";
-    else if (score >= 4) evalOut.textContent = "Acceptable trade-off";
-    else evalOut.textContent = "Not optimal";
+    if (torque.value < 5)
+        evalOut.textContent = "Fails minimum torque constraint";
+    else if (score >= 6)
+        evalOut.textContent = "Well-balanced trade-off";
+    else if (score >= 4)
+        evalOut.textContent = "Acceptable trade-off";
+    else
+        evalOut.textContent = "Not optimal";
 
     focusOut.textContent =
-        w.speed > w.torque && w.speed > w.cost ? "Speed-prioritized" :
-        w.torque > w.speed && w.torque > w.cost ? "Torque-prioritized" :
-        w.cost > w.speed && w.cost > w.torque ? "Cost-prioritized" :
-        "Balanced";
-
-    drawDesignChart();
-    drawPriorityChart();
+        weights.speed > weights.torque && weights.speed > weights.cost
+            ? "Speed-prioritized"
+            : weights.torque > weights.speed && weights.torque > weights.cost
+            ? "Torque-prioritized"
+            : weights.cost > weights.speed && weights.cost > weights.torque
+            ? "Cost-prioritized"
+            : "Balanced";
 }
 
 function drawDesignChart() {
@@ -95,17 +107,18 @@ function drawPriorityChart() {
     const vals = [speedP.value, torqueP.value, costP.value];
     const colors = ["#778da9", "#415a77", "#1b263b"];
 
-    let x = 50;
     vals.forEach((v, i) => {
         pCtx.fillStyle = colors[i];
-        pCtx.fillRect(x, 100 - v, 100, v);
-        x += 150;
+        pCtx.fillRect(100 + i * 160, 180 - v, 80, v);
     });
 }
 
 document.getElementById("saveBtn").addEventListener("click", () => {
     const name = document.getElementById("designName").value || "Unnamed Design";
-    savedDesigns.push({ name, score: Number(scoreOut.textContent) });
+    const score = scoreOut.textContent;
+    if (score === "—") return;
+
+    savedDesigns.push({ name, score: Number(score) });
     savedDesigns.sort((a, b) => b.score - a.score);
     renderSaved();
 });
@@ -121,11 +134,7 @@ function renderSaved() {
 }
 
 [speed, torque, cost, speedP, torqueP, costP].forEach(el =>
-    el.addEventListener("input", () => {
-        updateSliderLabels();
-        calculate();
-    })
+    el.addEventListener("input", calculate)
 );
 
-updateSliderLabels();
 calculate();
