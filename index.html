@@ -13,6 +13,7 @@
 
 <main>
 
+
 <section class="card center">
     <h2>Design Setup</h2>
 
@@ -20,48 +21,57 @@
         type="text" 
         id="designName" 
         placeholder="Design Name (e.g., Drivetrain A)"
+        class="design-name"
     >
 
-    <div class="sliders">
-        <label>Speed: <span id="speedVal">5</span></label>
+    <div class="control-row">
+        <label for="speed">Speed</label>
         <input type="range" id="speed" min="1" max="10" value="5">
-
-        <label>Torque: <span id="torqueVal">5</span></label>
-        <input type="range" id="torque" min="1" max="10" value="5">
-
-        <label>Cost: <span id="costVal">5</span></label>
-        <input type="range" id="cost" min="1" max="10" value="5">
+        <span id="speedVal">5</span>
     </div>
-    <input type="number" id="speedPriority" value="40" min="0" max="100">
-    <input type="number" id="torquePriority" value="40" min="0" max="100">
-    <input type="number" id="costPriority" value="20" min="0" max="100">
 
+    <div class="control-row">
+        <label for="torque">Torque</label>
+        <input type="range" id="torque" min="1" max="10" value="5">
+        <span id="torqueVal">5</span>
+    </div>
+
+    <div class="control-row">
+        <label for="cost">Cost</label>
+        <input type="range" id="cost" min="1" max="10" value="5">
+        <span id="costVal">5</span>
+    </div>
 </section>
+
 
 <section class="card center">
     <h2>Design Priorities (Allocate 100 Points)</h2>
 
-    <p class="hint">Distribute priority points to reflect design intent</p>
+    <p class="hint">
+        Distribute priority points to reflect design intent.
+        Total must equal <strong>100</strong>.
+    </p>
 
     <div class="priority-grid">
         <div>
-            <label>Speed Priority</label>
-            <input type="number" id="speedPriority" value="40">
+            <label for="speedPriority">Speed Priority</label>
+            <input type="number" id="speedPriority" value="40" min="0" max="100">
         </div>
 
         <div>
-            <label>Torque Priority</label>
-            <input type="number" id="torquePriority" value="40">
+            <label for="torquePriority">Torque Priority</label>
+            <input type="number" id="torquePriority" value="40" min="0" max="100">
         </div>
 
         <div>
-            <label>Cost Priority</label>
-            <input type="number" id="costPriority" value="20">
+            <label for="costPriority">Cost Priority</label>
+            <input type="number" id="costPriority" value="20" min="0" max="100">
         </div>
     </div>
 
     <p id="priorityStatus"></p>
 </section>
+
 
 <section class="card center">
     <h2>Live Evaluation</h2>
@@ -76,6 +86,7 @@
 
     <button id="saveBtn">Save Design</button>
 </section>
+
 
 <section class="card center">
     <h2>Saved Designs (Ranked)</h2>
