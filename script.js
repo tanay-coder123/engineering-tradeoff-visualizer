@@ -1,138 +1,89 @@
-const speed = document.getElementById("speed");
-const torque = document.getElementById("torque");
-const cost = document.getElementById("cost");
+const canvas = document.getElementById("chart");
+const ctx = canvas.getContext("2d");
 
-const speedP = document.getElementById("speedPriority");
-const torqueP = document.getElementById("torquePriority");
-const costP = document.getElementById("costPriority");
+const scoreEl = document.getElementById("score");
+const evalEl = document.getElementById("evaluation");
+const focusEl = document.getElementById("focus");
+const weightDisplay = document.getElementById("weightDisplay");
+const savedList = document.getElementById("savedList");
 
-const scoreOut = document.getElementById("score");
-const evalOut = document.getElementById("evaluation");
-const focusOut = document.getElementById("focus");
-const statusOut = document.getElementById("priorityStatus");
+let savedDesigns = [];
 
-const dCtx = document.getElementById("designChart").getContext("2d");
-const pCtx = document.getElementById("priorityChart").getContext("2d");
-
-function updateLabels() {
-    document.getElementById("speedVal").textContent = speed.value;
-    document.getElementById("torqueVal").textContent = torque.value;
-    document.getElementById("costVal").textContent = cost.value;
-}
-
-function getWeights() {
-    const s = Number(speedP.value);
-    const t = Number(torqueP.value);
-    const c = Number(costP.value);
-
-    if (s < 0 || t < 0 || c < 0) {
-        statusOut.textContent = "Priorities cannot be negative";
-        statusOut.style.color = "red";
-        return null;
-    }
-
-    const total = s + t + c;
-    if (total !== 100) {
-        statusOut.textContent = `Total priority must equal 100 (Current: ${total})`;
-        statusOut.style.color = "red";
-        return null;
-    }
-
-    statusOut.textContent = "Priority distribution valid";
-    statusOut.style.color = "green";
-
-    return {
-        speed: s / 100,
-        torque: t / 100,
-        cost: c / 100
-    };
-}
-
-function computeScore(weights) {
-    let score =
-        speed.value * weights.speed +
-        torque.value * weights.torque -
-        cost.value * weights.cost;
-
-    if (torque.value < 5) score -= 1;
-
-    return score;
-}
-
-function updateEvaluation(score, weights) {
-    scoreOut.textContent = score.toFixed(2);
-
-    if (torque.value < 5) {
-        evalOut.textContent = "Fails minimum torque constraint";
-    } else if (score >= 6) {
-        evalOut.textContent = "Well-balanced trade-off";
-    } else if (score >= 4) {
-        evalOut.textContent = "Acceptable trade-off";
-    } else {
-        evalOut.textContent = "Not optimal";
-    }
-
-    focusOut.textContent =
-        weights.speed > weights.torque && weights.speed > weights.cost
-            ? "Speed-prioritized"
-            : weights.torque > weights.speed && weights.torque > weights.cost
-            ? "Torque-prioritized"
-            : weights.cost > weights.speed && weights.cost > weights.torque
-            ? "Cost-prioritized"
-            : "Balanced";
-}
-
-function drawDesignChart() {
-    dCtx.clearRect(0, 0, 600, 300);
-    const vals = [speed.value, torque.value, cost.value];
-    const labels = ["Speed", "Torque", "Cost"];
-
-    vals.forEach((v, i) => {
-        dCtx.fillStyle = "#415a77";
-        dCtx.fillRect(150 + i * 120, 260 - v * 20, 60, v * 20);
-        dCtx.fillStyle = "#000";
-        dCtx.fillText(labels[i], 155 + i * 120, 280);
-    });
-}
-
-function drawPriorityChart() {
-    pCtx.clearRect(0, 0, 600, 200);
-    const vals = [speedP.value, torqueP.value, costP.value];
-    const colors = ["#778da9", "#415a77", "#1b263b"];
-
-    vals.forEach((v, i) => {
-        pCtx.fillStyle = colors[i];
-        pCtx.fillRect(100 + i * 160, 180 - v, 80, v);
-    });
-}
-
-function calculate() {
-    updateLabels();
-
-    const weights = getWeights();
-
-    // Always reset evaluation FIRST
-    scoreOut.textContent = "—";
-    evalOut.textContent = "Waiting for valid inputs";
-    focusOut.textContent = "—";
-
-    // Clear charts if invalid
-    if (!weights) {
-        dCtx.clearRect(0, 0, 600, 300);
-        pCtx.clearRect(0, 0, 600, 200);
-        return;
-    }
-
-    // Compute → Render → Explain (correct order)
-    const score = computeScore(weights);
-
-    drawDesignChart();
-    drawPriorityChart();
-    updateEvaluation(score, weights);
-}
-
-[speed, torque, cost, speedP, torqueP, costP].forEach(el =>
-    el.addEventListener("input", calculate)
+document.querySelectorAll("input").forEach(i =>
+    i.addEventListener("input", update)
 );
 
-calculate();
+function normalize(a, b, c) {
+    const sum = a + b + c || 1;
+    return [a / sum, b / sum, c / sum];
+}
+
+function update() {
+    const speed = +speedInput.value;
+    const torque = +torqueInput.value;
+    const cost = +costInput.value;
+
+    const wS = Math.max(0, +wSpeed.value);
+    const wT = Math.max(0, +wTorque.value);
+    const wC = Math.max(0, +wCost.value);
+
+    const [ws, wt, wc] = normalize(wS, wT, wC);
+
+    weightDisplay.textContent =
+        `Normalized Weights → Speed: ${(ws*100).toFixed(0)}%, Torque: ${(wt*100).toFixed(0)}%, Cost: ${(wc*100).toFixed(0)}%`;
+
+    const score = (speed * ws + torque * wt) - (cost * wc);
+    scoreEl.textContent = score.toFixed(2);
+
+    let evaluation;
+    if (torque < 3) evaluation = "Fails torque constraint";
+    else if (score >= 6) evaluation = "Well-balanced design";
+    else if (score >= 4) evaluation = "Acceptable trade-off";
+    else evaluation = "Suboptimal design";
+
+    evalEl.textContent = evaluation;
+
+    let focus;
+    if (ws > wt && ws > wc) focus = "Performance-focused";
+    else if (wt > ws && wt > wc) focus = "Power-focused";
+    else if (wc > ws && wc > wt) focus = "Cost-driven";
+    else focus = "Balanced priorities";
+
+    focusEl.textContent = focus;
+
+    drawChart(speed, torque, cost);
+}
+
+function drawChart(s, t, c) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const values = [s, t, c];
+    const labels = ["Speed", "Torque", "Cost"];
+    const colors = ["#0077b6", "#00b4d8", "#adb5bd"];
+
+    const barWidth = 80;
+
+    values.forEach((v, i) => {
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(80 + i * 120, 240 - v * 20, barWidth, v * 20);
+        ctx.fillStyle = "#000";
+        ctx.fillText(labels[i], 90 + i * 120, 255);
+    });
+}
+
+function saveDesign() {
+    const name = nameInput.value || `Design ${savedDesigns.length + 1}`;
+    savedDesigns.push(`${name} → Score ${scoreEl.textContent}`);
+    renderSaved();
+}
+
+function renderSaved() {
+    savedList.innerHTML = "";
+    savedDesigns.forEach(d => {
+        const li = document.createElement("li");
+        li.textContent = d;
+        savedList.appendChild(li);
+    });
+}
+
+update();
