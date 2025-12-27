@@ -9,71 +9,72 @@
 
 <nav>
     <h1>Engineering Trade-Off Visualizer</h1>
+    <p>Interactive design comparison tool</p>
 </nav>
 
 <main>
 
-    <section class="card center">
-        <label>Design Name</label>
-        <input id="name" type="text" placeholder="FRC Drivetrain A">
-    </section>
+<section class="card">
+    <h2>Design Inputs</h2>
 
-    <section class="card center">
-        <h2>Design Ratings</h2>
+    <input id="designName" type="text" placeholder="Design Name">
 
-        <div class="slider-group">
-            <label>Speed: <span id="speedVal">5</span></label>
-            <input type="range" id="speed" min="0" max="10" value="5">
+    <div class="slider-group">
+        <label>Speed: <span id="speedVal">5</span></label>
+        <input type="range" id="speed" min="1" max="10" value="5">
+
+        <label>Torque: <span id="torqueVal">5</span></label>
+        <input type="range" id="torque" min="1" max="10" value="5">
+
+        <label>Cost: <span id="costVal">5</span></label>
+        <input type="range" id="cost" min="1" max="10" value="5">
+    </div>
+</section>
+
+<section class="card">
+    <h2>Design Priorities (Allocate 100)</h2>
+
+    <div class="priority-grid">
+        <div>
+            <label>Speed</label>
+            <input type="number" id="speedPriority" min="0" max="100" value="40">
         </div>
-
-        <div class="slider-group">
-            <label>Torque: <span id="torqueVal">5</span></label>
-            <input type="range" id="torque" min="0" max="10" value="5">
+        <div>
+            <label>Torque</label>
+            <input type="number" id="torquePriority" min="0" max="100" value="40">
         </div>
-
-        <div class="slider-group">
-            <label>Cost: <span id="costVal">5</span></label>
-            <input type="range" id="cost" min="0" max="10" value="5">
+        <div>
+            <label>Cost</label>
+            <input type="number" id="costPriority" min="0" max="100" value="20">
         </div>
-    </section>
+    </div>
 
-    <section class="card center">
-        <h2>Design Priorities</h2>
+    <p id="priorityStatus"></p>
+</section>
 
-        <div class="slider-group">
-            <label>Speed Priority</label>
-            <input type="range" id="wSpeed" min="0" max="10" value="4">
-        </div>
+<section class="card">
+    <h2>Visualization</h2>
 
-        <div class="slider-group">
-            <label>Torque Priority</label>
-            <input type="range" id="wTorque" min="0" max="10" value="4">
-        </div>
+    <div class="chart-container">
+        <canvas id="designChart" width="600" height="300"></canvas>
+        <canvas id="priorityChart" width="600" height="200"></canvas>
+    </div>
+</section>
 
-        <div class="slider-group">
-            <label>Cost Priority</label>
-            <input type="range" id="wCost" min="0" max="10" value="2">
-        </div>
+<section class="card">
+    <h2>Live Evaluation</h2>
 
-        <p id="weightDisplay"></p>
-    </section>
+    <p><strong>Score:</strong> <span id="score">0.00</span></p>
+    <p><strong>Evaluation:</strong> <span id="evaluation"></span></p>
+    <p><strong>Design Focus:</strong> <span id="focus"></span></p>
 
-    <section class="card center">
-        <canvas id="chart" width="520" height="300"></canvas>
-        <button onclick="saveDesign()">Save Design</button>
-    </section>
+    <button id="saveBtn">Save Design</button>
+</section>
 
-    <section class="card center">
-        <h2>Evaluation</h2>
-        <p><strong>Score:</strong> <span id="score">—</span></p>
-        <p><strong>Conclusion:</strong> <span id="evaluation">—</span></p>
-        <p><strong>Design Focus:</strong> <span id="focus">—</span></p>
-    </section>
-
-    <section class="card center">
-        <h2>Saved Designs</h2>
-        <ul id="saved"></ul>
-    </section>
+<section class="card">
+    <h2>Saved Designs</h2>
+    <div id="designList"></div>
+</section>
 
 </main>
 
