@@ -14,16 +14,13 @@ const statusOut = document.getElementById("priorityStatus");
 const dCtx = document.getElementById("designChart").getContext("2d");
 const pCtx = document.getElementById("priorityChart").getContext("2d");
 
-const designList = document.getElementById("designList");
-let savedDesigns = [];
-
 function updateLabels() {
     document.getElementById("speedVal").textContent = speed.value;
     document.getElementById("torqueVal").textContent = torque.value;
     document.getElementById("costVal").textContent = cost.value;
 }
 
-function validateWeights() {
+function getWeights() {
     const s = Number(speedP.value);
     const t = Number(torqueP.value);
     const c = Number(costP.value);
@@ -44,23 +41,14 @@ function validateWeights() {
     statusOut.textContent = "Priority distribution valid";
     statusOut.style.color = "green";
 
-    return { speed: s / 100, torque: t / 100, cost: c / 100 };
+    return {
+        speed: s / 100,
+        torque: t / 100,
+        cost: c / 100
+    };
 }
 
-function calculate() {
-    updateLabels();
-    const weights = validateWeights();
-
-    drawDesignChart();
-    drawPriorityChart();
-
-    if (!weights) {
-        scoreOut.textContent = "—";
-        evalOut.textContent = "Waiting for valid priorities";
-        focusOut.textContent = "—";
-        return;
-    }
-
+function computeScore(weights) {
     let score =
         speed.value * weights.speed +
         torque.value * weights.torque -
@@ -68,16 +56,21 @@ function calculate() {
 
     if (torque.value < 5) score -= 1;
 
+    return score;
+}
+
+function updateEvaluation(score, weights) {
     scoreOut.textContent = score.toFixed(2);
 
-    if (torque.value < 5)
+    if (torque.value < 5) {
         evalOut.textContent = "Fails minimum torque constraint";
-    else if (score >= 6)
+    } else if (score >= 6) {
         evalOut.textContent = "Well-balanced trade-off";
-    else if (score >= 4)
+    } else if (score >= 4) {
         evalOut.textContent = "Acceptable trade-off";
-    else
+    } else {
         evalOut.textContent = "Not optimal";
+    }
 
     focusOut.textContent =
         weights.speed > weights.torque && weights.speed > weights.cost
@@ -113,24 +106,29 @@ function drawPriorityChart() {
     });
 }
 
-document.getElementById("saveBtn").addEventListener("click", () => {
-    const name = document.getElementById("designName").value || "Unnamed Design";
-    const score = scoreOut.textContent;
-    if (score === "—") return;
+function calculate() {
+    updateLabels();
 
-    savedDesigns.push({ name, score: Number(score) });
-    savedDesigns.sort((a, b) => b.score - a.score);
-    renderSaved();
-});
+    const weights = getWeights();
 
-function renderSaved() {
-    designList.innerHTML = "";
-    savedDesigns.forEach((d, i) => {
-        const div = document.createElement("div");
-        div.className = "design-card";
-        div.innerHTML = `<strong>${i + 1}. ${d.name}</strong><br>Score: ${d.score}`;
-        designList.appendChild(div);
-    });
+    // Always reset evaluation FIRST
+    scoreOut.textContent = "—";
+    evalOut.textContent = "Waiting for valid inputs";
+    focusOut.textContent = "—";
+
+    // Clear charts if invalid
+    if (!weights) {
+        dCtx.clearRect(0, 0, 600, 300);
+        pCtx.clearRect(0, 0, 600, 200);
+        return;
+    }
+
+    // Compute → Render → Explain (correct order)
+    const score = computeScore(weights);
+
+    drawDesignChart();
+    drawPriorityChart();
+    updateEvaluation(score, weights);
 }
 
 [speed, torque, cost, speedP, torqueP, costP].forEach(el =>
