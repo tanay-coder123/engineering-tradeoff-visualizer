@@ -1,70 +1,93 @@
 body {
     margin: 0;
-    font-family: system-ui, sans-serif;
-    background: #f4f6f8;
+    font-family: Arial, sans-serif;
+    background: #eef1f4;
     color: #222;
 }
 
 nav {
-    background: #0d1b2a;
+    background: #1b263b;
     color: white;
-    padding: 16px;
+    padding: 20px;
     text-align: center;
 }
 
 main {
-    max-width: 850px;
+    max-width: 900px;
     margin: auto;
-    padding: 20px;
+    padding: 25px;
 }
 
 .card {
     background: white;
-    padding: 22px;
+    padding: 25px;
+    margin-bottom: 30px;
     border-radius: 8px;
-    margin-bottom: 20px;
 }
 
-.center {
-    text-align: center;
+h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
 }
 
 input[type="text"] {
-    width: 240px;
-    padding: 6px;
-    margin-top: 8px;
+    width: 280px;
+    padding: 8px;
+    margin-bottom: 20px;
 }
 
-.slider-group {
-    margin: 15px auto;
-    max-width: 400px;
-}
-
-input[type="range"] {
+.slider-group input {
     width: 100%;
+    margin-bottom: 15px;
+}
+
+.priority-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.priority-grid input {
+    width: 80px;
+    padding: 6px;
+    text-align: center;
+}
+
+#priorityStatus {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+canvas {
+    margin: 15px 0;
+    background: #fafafa;
+    border: 1px solid #ddd;
 }
 
 button {
     margin-top: 15px;
-    padding: 10px 22px;
-    font-size: 1em;
-    background: #1b263b;
+    padding: 10px 20px;
+    background: #003566;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
 button:hover {
-    background: #415a77;
+    background: #001d3d;
 }
 
-canvas {
-    display: block;
-    margin: 0 auto 15px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
+.design-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
 }
