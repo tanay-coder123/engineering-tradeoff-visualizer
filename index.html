@@ -13,68 +13,66 @@
 
 <main>
 
-    <section class="card">
-        <h2>Design Inputs</h2>
-
+    <section class="card center">
         <label>Design Name</label>
-        <input id="name" type="text" placeholder="e.g. FRC Drivetrain A">
+        <input id="name" type="text" placeholder="FRC Drivetrain A">
+    </section>
 
-        <div class="grid">
-            <div>
-                <label>Speed</label>
-                <input id="speed" type="number" min="0" max="10" value="5">
-            </div>
-            <div>
-                <label>Torque</label>
-                <input id="torque" type="number" min="0" max="10" value="5">
-            </div>
-            <div>
-                <label>Cost</label>
-                <input id="cost" type="number" min="0" max="10" value="5">
-            </div>
+    <section class="card center">
+        <h2>Design Ratings</h2>
+
+        <div class="slider-group">
+            <label>Speed: <span id="speedVal">5</span></label>
+            <input type="range" id="speed" min="0" max="10" value="5">
+        </div>
+
+        <div class="slider-group">
+            <label>Torque: <span id="torqueVal">5</span></label>
+            <input type="range" id="torque" min="0" max="10" value="5">
+        </div>
+
+        <div class="slider-group">
+            <label>Cost: <span id="costVal">5</span></label>
+            <input type="range" id="cost" min="0" max="10" value="5">
         </div>
     </section>
 
-    <section class="card">
+    <section class="card center">
         <h2>Design Priorities</h2>
 
-        <p class="note">
-            Assign priority points (non-negative). Weights are automatically normalized.
-        </p>
+        <div class="slider-group">
+            <label>Speed Priority</label>
+            <input type="range" id="wSpeed" min="0" max="10" value="4">
+        </div>
 
-        <div class="grid">
-            <div>
-                <label>Speed Priority</label>
-                <input id="wSpeed" type="number" min="0" value="1">
-            </div>
-            <div>
-                <label>Torque Priority</label>
-                <input id="wTorque" type="number" min="0" value="1">
-            </div>
-            <div>
-                <label>Cost Priority</label>
-                <input id="wCost" type="number" min="0" value="1">
-            </div>
+        <div class="slider-group">
+            <label>Torque Priority</label>
+            <input type="range" id="wTorque" min="0" max="10" value="4">
+        </div>
+
+        <div class="slider-group">
+            <label>Cost Priority</label>
+            <input type="range" id="wCost" min="0" max="10" value="2">
         </div>
 
         <p id="weightDisplay"></p>
     </section>
 
     <section class="card center">
-        <canvas id="chart" width="420" height="260"></canvas>
+        <canvas id="chart" width="520" height="300"></canvas>
         <button onclick="saveDesign()">Save Design</button>
     </section>
 
-    <section class="card results">
-        <h2>Live Evaluation</h2>
+    <section class="card center">
+        <h2>Evaluation</h2>
         <p><strong>Score:</strong> <span id="score">—</span></p>
-        <p><strong>Evaluation:</strong> <span id="evaluation">—</span></p>
+        <p><strong>Conclusion:</strong> <span id="evaluation">—</span></p>
         <p><strong>Design Focus:</strong> <span id="focus">—</span></p>
     </section>
 
-    <section class="card">
+    <section class="card center">
         <h2>Saved Designs</h2>
-        <ul id="savedList"></ul>
+        <ul id="saved"></ul>
     </section>
 
 </main>
